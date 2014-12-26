@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
+import org.weyoung.photoview.PhotoIndicator;
 import org.weyoung.photoview.PhotoView;
 
 
@@ -27,6 +28,7 @@ public class ViewPagerActivity extends Activity {
 	private static final String ISLOCKED_ARG = "isLocked";
 	
 	private ViewPager mViewPager;
+    private PhotoIndicator photoIndicator;
 	private MenuItem menuLockItem;
 	
     @Override
@@ -34,9 +36,30 @@ public class ViewPagerActivity extends Activity {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_pager);
         mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
-		setContentView(mViewPager);
+        photoIndicator = (PhotoIndicator) findViewById(R.id.photo_indicator);
 
-		mViewPager.setAdapter(new SamplePagerAdapter());
+        SamplePagerAdapter adapter = new SamplePagerAdapter();
+        mViewPager.setAdapter(adapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            int lastOffset = 0;
+            int direction = 0;
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if(lastOffset == 0 && positionOffsetPixels != 0) {
+                    direction = positionOffsetPixels < 10 ? 1 : -1;
+                    lastOffset = positionOffsetPixels;
+                }
+                if(photoIndicator != null) {
+                    photoIndicator.setPinPosition(position, positionOffset, direction);
+                }
+                if(lastOffset == 0) {
+                    direction = 0;
+                }
+            }
+        });
+
+        photoIndicator.setMaxIndex(adapter.getCount());
+        photoIndicator.setCurrentIndex(0);
 		
 		if (savedInstanceState != null) {
 			boolean isLocked = savedInstanceState.getBoolean(ISLOCKED_ARG, false);
