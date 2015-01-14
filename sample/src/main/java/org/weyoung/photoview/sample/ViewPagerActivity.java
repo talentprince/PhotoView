@@ -45,15 +45,22 @@ public class ViewPagerActivity extends Activity {
             int direction = 0;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(lastOffset == 0 && positionOffsetPixels != 0) {
-                    direction = positionOffsetPixels < 10 ? 1 : -1;
+                if (lastOffset == 0 && positionOffsetPixels != 0) {
+                    direction = positionOffsetPixels < mViewPager.getWidth() / 2 ? 1 : -1;
                     lastOffset = positionOffsetPixels;
                 }
-                if(photoIndicator != null) {
+                if (positionOffsetPixels == 0) {
+                    direction = 0;
+                }
+                if (photoIndicator != null) {
                     photoIndicator.setPinPosition(position, positionOffset, direction);
                 }
-                if(lastOffset == 0) {
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if(state == ViewPager.SCROLL_STATE_IDLE) {
                     direction = 0;
+                    lastOffset = 0;
                 }
             }
         });
